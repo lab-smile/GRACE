@@ -20,7 +20,7 @@ For example:
 ## Use
 To run the program, only the main.py file needs to be run. Before doing so, however, parts of the main.py file should be changed to create the desired images.
 
-First, the each subject should be added to the SUBLIST dictionary. Each subject should follow this format:
+First, each subject should be added to the SUBLIST dictionary. Each subject should follow this format:
 
     SUBLIST['subject_name'] = ['T1_filepath', 'charm_filepath', 'headreco_filepath', 'grace_filepath']
 
