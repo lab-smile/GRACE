@@ -5,7 +5,7 @@ import matplotlib.cm as cm
 import numpy as np
 import os
 from skimage import measure
-from constants import *
+from constants_v1 import *
 
 
 def outline_black(image):
@@ -204,7 +204,7 @@ def generate_image(color_list, outline_list, T1_load, image_load, axial, coronal
     imgs_comb = Image.fromarray(list_im)
     imgs_comb_out = Image.fromarray(outline_im)
 
-    imgs_comb = imgs_comb.convert("RGBA")
+    # imgs_comb = imgs_comb.convert("RGBA")
     imgs_comb.save(f'{sub_name}_{mode}.png', format='PNG')
     imgs_comb_out.save(f'{sub_name}_{mode}_outline.png', format='PNG')
     for image in images:
@@ -273,7 +273,7 @@ def generate_image_no_T1(color_list, outline_list, image_load, axial, coronal, s
     imgs_comb = Image.fromarray(list_im)
     imgs_comb_out = Image.fromarray(outline_im)
 
-    imgs_comb = imgs_comb.convert("RGBA")
+    # imgs_comb = imgs_comb.convert("RGBA")
     imgs_comb.save(f'{sub_name}_{mode}.png', format='PNG')
     imgs_comb_out.save(f'{sub_name}_{mode}_outline.png', format='PNG')
     for image in images:

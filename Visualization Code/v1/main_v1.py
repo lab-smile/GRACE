@@ -5,8 +5,8 @@ import matplotlib.colors as colors
 from matplotlib.colors import ListedColormap
 import os
 from PIL import Image
-from constants import *
-from functions import *
+from constants_v1 import *
+from functions_v1 import *
 
 AXIAL_SLICENUM = 88 # overhead view
 SAGGITAL_SLICENUM = 256 # side view
