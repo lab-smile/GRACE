@@ -10,6 +10,9 @@ The purpose of this manual is to help you successfully run the GRACE train and t
 #### **Prerequisites**
 All operations described in this manual are based on a comprehensive enhanced terminal, MobaXterm. You can also use the other cross-platform server application as your preference.
 
+#### **Pre-Trained Model**
+You can download the weights for our pre-trained model at the following link: https://www.dropbox.com/scl/fi/8i75chjrs0alpfpb7ni3j/GRACE.pth?rlkey=jx8ltbinher52r0cfly3pm3ns&dl=0
+
 #### **Obatian GRACE code and dataset**
 In order not to disturb the others’ work environment, you need to go to your own directory by typing the command below, you can see the prefix changed when you change your directory:<br>
 <center>cd /blue/ruogu.fang/[your username]</center>
