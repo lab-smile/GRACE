@@ -12,8 +12,8 @@ All operations described in this manual are based on a comprehensive enhanced te
 
 #### **Pre-Trained Model**
 You can download the weights for our pre-trained model at either of the following links: 
-Dropbox - https://www.dropbox.com/scl/fi/8i75chjrs0alpfpb7ni3j/GRACE.pth?rlkey=jx8ltbinher52r0cfly3pm3ns&dl=0, 
-Google Drive - https://drive.google.com/file/d/1C_oidhimoReTV_learRM4-6SX4EEPidu/view?usp=sharing
+- Dropbox - https://www.dropbox.com/scl/fi/8i75chjrs0alpfpb7ni3j/GRACE.pth?rlkey=jx8ltbinher52r0cfly3pm3ns&dl=0, 
+- Google Drive - https://drive.google.com/file/d/1C_oidhimoReTV_learRM4-6SX4EEPidu/view?usp=sharing
 
 #### **Obatian GRACE code and dataset**
 In order not to disturb the others’ work environment, you need to go to your own directory by typing the command below, you can see the prefix changed when you change your directory:<br>
