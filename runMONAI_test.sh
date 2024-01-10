@@ -1,15 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name=monai_test
-#SBATCH --mail-type=END,FAIL          
-#SBATCH --mail-user=skylastolte4444@ufl.edu     	
-#SBATCH --ntasks=1                   
-#SBATCH --cpus-per-task=4
-#SBATCH --distribution=block:block 
-#SBATCH --partition=hpg-ai
-#SBATCH --gres=gpu:a100:2
-#SBATCH --mem=30gb                     
-#SBATCH --time=72:00:00               
-#SBATCH --output=%x_%j.log 
 
 #module load pytorch
 module load singularity

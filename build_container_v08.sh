@@ -1,12 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=build_container  
-#SBATCH --mail-type=END,FAIL          
-#SBATCH --mail-user=skylastolte4444@ufl.edu  
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=30gb
-#SBATCH --time=08:00:00
-#SBATCH --output=%x.%j.out
+
 date;hostname;pwd
 
 module load singularity
