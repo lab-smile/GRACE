@@ -26,7 +26,7 @@ Imaging NeuroScience<br>
 - A representative GRACE model is available from this GITHUB. This model may be particularly useful to those who need segmentations of MRIs on older adult heads.
 
 <div align="center">
-	<img src="https://github.com/lab-smile/GRACE/Images/Figure11.pdf" width="700">
+	<img src="https://github.com/lab-smile/GRACE/Images/Figure11.png" width="700">
 </div>
 
 <div align="center">
