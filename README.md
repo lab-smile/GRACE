@@ -67,7 +67,7 @@ The GRACE code uses the MONAI, an open-source foundation. We provide a .sh scrip
 
 Run the following code in the terminal, you need to change the line after --sandbox to your desired writable directory and change the line after --nv to your own directory.
 ```
-sbatch building_container_v08.sh
+sbatch build_container_v08.sh
 ```
 
 The output should be a folder named monaicore08 under your desired directory.
