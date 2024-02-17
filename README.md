@@ -38,7 +38,7 @@ Imaging NeuroScience<br>
 ## Usage
 
 ### Pretrained Models
-Our pretrained models can be found at either of the following two links:
+Our pretrained model can be found at the v1.0.0 release of this GitHub or at either of the following two links:
 
 - Google Drive: https://drive.google.com/file/d/1C_oidhimoReTV_learRM4-6SX4EEPidu/view?usp=sharing
 
