@@ -67,7 +67,7 @@ The GRACE code uses the MONAI, an open-source foundation. We provide a .sh scrip
 
 Run the following code in the terminal, you need to change the line after --sandbox to your desired writable directory and change the line after --nv to your own directory.
 ```
-sbatch build_container_v08.sh
+./build_container_v08.sh
 ```
 
 The output should be a folder named monaicore08 under your desired directory.
@@ -75,7 +75,7 @@ The output should be a folder named monaicore08 under your desired directory.
 ### Training
 Once the data and the container are ready, you can train the model by using the following command:
 ```
-sbatch train.sh
+./train.sh
 ```
 Before you training the model, you need to make sure change the following directory:
 - change the first singularity exec -nv to the directory includes monaicore08, for example: /user/GRACE/monaicore08
@@ -87,7 +87,7 @@ You can also specify the max iteration number for training. For the iterations =
 ### Testing
 The test progress is very similar to the training progress. You need to change all paths and make sure the model_save_name matches your model name in runMONAI.sh. Then running the runMONAI_test.sh with the following command: 
 ```
-sbatch test.sh
+./test.sh
 ```
 The outputs for each test subject is saved as a mat file.
 
