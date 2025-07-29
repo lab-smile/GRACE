@@ -26,6 +26,15 @@ Imaging NeuroScience<br>
 - A representative GRACE model is available from this GITHUB. This model may be particularly useful to those who need segmentations of MRIs on older adult heads.
 
 <div align="center">
+	<img src="https://github.com/lab-smile/GRACE/blob/main/Images/Figure3.png" width="700">
+</div>
+
+<div align="center">
+  <b>fig. 1:</b> The segmentation labels for GRACE are as such. These numerical labels correspond to the same labels that appear in the GRACE outputs from this repo. For instance, a voxel output of "1" corresponds to White matter (WM).<br>
+</div>
+<br>
+
+<div align="center">
 	<img src="https://github.com/lab-smile/GRACE/blob/main/Images/Figure11.png" width="700">
 </div>
 
