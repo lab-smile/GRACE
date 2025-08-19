@@ -163,7 +163,7 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-5)
 
 #-----------------------------------
 
-model.load_state_dict(torch.load(os.path.join(args.data_dir, args.model_load_name)))
+model.load_state_dict(torch.load(os.path.join(args.data_dir, args.model_load_name)), strict=False))
 model.eval()
 
 case_num = len(test_ds)
