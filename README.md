@@ -47,11 +47,7 @@ Imaging NeuroScience<br>
 ## Usage
 
 ### Pretrained Models
-Our pretrained model can be found at the v1.0.0 release of this GitHub or at either of the following two links:
-
-- Google Drive: https://drive.google.com/file/d/1C_oidhimoReTV_learRM4-6SX4EEPidu/view?usp=sharing
-
-- Dropbox: https://www.dropbox.com/scl/fi/8i75chjrs0alpfpb7ni3j/GRACE.pth?rlkey=jx8ltbinher52r0cfly3pm3ns&dl=0
+Our pretrained model can be found at the v1.0.1 release of this GitHub.
 
 ### MATLAB Segmentation Label Preparation
 You can find there are two MATLAB codes, you can directly change the directory to your own data. You need to select the GRACE working folder and add to path before you running these two MATLAB codes. 
