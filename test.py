@@ -22,7 +22,7 @@ from monai.losses import DiceCELoss
 from monai.inferers import sliding_window_inference
 from monai.transforms import (
     AsDiscrete,
-    AddChanneld,
+    #AddChanneld,
     Compose,
     CropForegroundd,
     LoadImaged,
@@ -37,6 +37,8 @@ from monai.transforms import (
     SpatialPadd,
     RandGaussianNoised,
     ToDeviced,
+    EnsureChannelFirstd,
+    EnsureTyped,
 )
 
 from monai.config import print_config
@@ -54,7 +56,9 @@ from monai.data import (
 
 #-----------------------------------
 
+print('GPUs')
 #set up starting conditions:
+print(torch.cuda.device_count())
 
 #start_time = time.time()
 print_config()
@@ -72,7 +76,7 @@ parser.add_argument("--a_max_value", type=int, default=255, help="maximum image 
 parser.add_argument("--a_min_value", type=int, default=0, help="minimum image intensity")
 args = parser.parse_args()
 
-split_JSON = "dataset_1.json"
+split_JSON = "dataset_csf.json"#_1_old.json"
 datasets = args.data_dir + split_JSON
 
 #os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -84,8 +88,9 @@ datasets = args.data_dir + split_JSON
 
 test_transforms = Compose(
     [
-        LoadImaged(keys=["image"]),
-        AddChanneld(keys=["image"]),
+        LoadImaged(keys=["image"]),# meta_keys=["image_meta_dict"]),
+        #AddChanneld(keys=["image"]),
+        EnsureChannelFirstd(keys=["image"]),
         Spacingd(
             keys=["image"],
             pixdim=(1.0, 1.0, 1.0),
@@ -94,8 +99,9 @@ test_transforms = Compose(
         Orientationd(keys=["image"], axcodes="RAS"),
         ScaleIntensityRanged(keys=["image"], a_min=args.a_min_value, a_max=args.a_max_value, b_min=0.0, b_max=1.0, clip=True),
         #CropForegroundd(keys=["image", "label"], source_key="image"),
-        ToTensord(keys=["image"]),
+        #ToTensord(keys=["image"]),
         #ToDeviced(keys=["image", "label"], device=device),
+        EnsureTyped(keys=["image"]),
     ]
     )
 
@@ -111,6 +117,10 @@ test_ds = Dataset(
 test_loader = DataLoader(
     test_ds, batch_size=args.batch_size_test, shuffle=False, num_workers=4, pin_memory=True, collate_fn=pad_list_data_collate,
 )
+
+sample = test_ds[0]
+print("DEBUG sample keys:", sample.keys())
+print("DEBUG sample type:", type(sample["image"]))
 
 #-----------------------------------
 
@@ -130,7 +140,7 @@ if args.dataparallel == "True":
       hidden_size=768,
       mlp_dim=3072,
       num_heads=12,
-      pos_embed="perceptron",
+      #pos_embed="perceptron",
       norm_name="instance",
       res_block=True,
       dropout_rate=0.0,
@@ -163,25 +173,37 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-5)
 
 #-----------------------------------
 
-model.load_state_dict(torch.load(os.path.join(args.data_dir, args.model_load_name)), strict=False))
+model.load_state_dict(torch.load(os.path.join(args.data_dir, args.model_load_name)))#, strict=False)
 model.eval()
+
+
+#from pathlib import Path
+# Get the filename without the extension
+#dirname = Path(filename).stem
+
+# Create the new directory
+# parents=True creates any necessary parent directories
+# exist_ok=True prevents an error if the directory already exists
+#Path(dirname).mkdir(parents=True, exist_ok=True)
 
 case_num = len(test_ds)
 for i in range(case_num):
     #start_time = time.time()
     with torch.no_grad():
-        img_name = os.path.split(test_ds[i]["image_meta_dict"]["filename_or_obj"])[1]
+        #img_name = test_ds[i]["image_meta_dict"]["filename_or_obj"].split("/")[-1] #os.path.split(test_ds[i]["image_meta_dict"]["filename_or_obj"])[1]
+        img_name = test_ds[i]["image"].meta["filename_or_obj"].split("/")[-1]
         img = test_ds[i]["image"]
         test_inputs = torch.unsqueeze(img, 1).cuda()
         #start_time = time.time()
         test_outputs = sliding_window_inference(test_inputs, (args.spatial_size, args.spatial_size, args.spatial_size), 4, model, overlap=0.8)
         #print("--- %s seconds ---" % (time.time() - start_time))
     #logits = test_outputs.detach().cpu().numpy()
+    print("Saving image " + str(i))
     testimage = torch.argmax(test_outputs, dim=1).detach().cpu().numpy()
     #savepath = 'testimage' + str(i) + '.mat'
     filename, file_extension = os.path.splitext(img_name)
     savepath = filename + '.mat'
-    savemat(os.path.join(args.data_dir,savepath), {'testimage':testimage})#, 'logits':logits})
+    savemat(os.path.join(args.data_dir,'results', savepath), {'testimage':testimage})#, 'logits':logits})
     #print("--- %s seconds ---" % (time.time() - start_time))
 
 #------------------------------------

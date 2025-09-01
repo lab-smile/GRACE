@@ -19,11 +19,11 @@ import pandas as pd
 
 #load monai functions - 
 
-from monai.losses import DiceCELoss
+from monai.losses import DiceCELoss, DiceFocalLoss
 from monai.inferers import sliding_window_inference
 from monai.transforms import (
     AsDiscrete,
-    AddChanneld,
+    #AddChanneld,
     Compose,
     CropForegroundd,
     LoadImaged,
@@ -36,7 +36,8 @@ from monai.transforms import (
     RandRotate90d,
     ToTensord,
     SpatialPadd,
-    RandGaussianNoised
+    RandGaussianNoised,
+    EnsureChannelFirstd
 )
 
 from monai.config import print_config
@@ -72,10 +73,12 @@ parser.add_argument("--model_save_name", type=str, default="unetr_v5_cos", help=
 parser.add_argument("--a_max_value", type=int, default=255, help="maximum image intensity")
 parser.add_argument("--a_min_value", type=int, default=0, help="minimum image intensity")
 parser.add_argument("--max_iteration", type=int, default=25000, help="number of iterations")
+parser.add_argument("--json_name", type=str, default="dataset", help="name of the file used to map data splits")
 args = parser.parse_args()
 
-split_JSON = "dataset_1.json"
+split_JSON = args.json_name #"dataset.json"
 datasets = args.data_dir + split_JSON
+num_classes = args.N_classes
 
 #-----------------------------------
 
@@ -84,7 +87,8 @@ datasets = args.data_dir + split_JSON
 train_transforms = Compose(
     [
         LoadImaged(keys=["image", "label"]),
-        AddChanneld(keys=["image", "label"]),
+        EnsureChannelFirstd(keys=["image", "label"]),
+        #AddChanneld(keys=["image", "label"]),
         Spacingd(
             keys=["image", "label"],
             pixdim=(1.0, 1.0, 1.0),
@@ -142,7 +146,8 @@ train_transforms = Compose(
 val_transforms = Compose(
     [
         LoadImaged(keys=["image", "label"]),
-        AddChanneld(keys=["image", "label"]),
+        EnsureChannelFirstd(keys=["image", "label"]),
+        #AddChanneld(keys=["image", "label"]),
         Spacingd(
             keys=["image", "label"],
             pixdim=(1.0, 1.0, 1.0),
@@ -193,7 +198,7 @@ model = nn.DataParallel(
     hidden_size=768,
     mlp_dim=3072,
     num_heads=12,
-    pos_embed="perceptron",
+    #pos_embed="perceptron",
     norm_name="instance",
     res_block=True,
     dropout_rate=0.0,
@@ -201,7 +206,7 @@ model = nn.DataParallel(
 
 #model = model.to(device)
 
-loss_function = DiceCELoss(to_onehot_y=True, softmax=True)
+loss_function = DiceCELoss(to_onehot_y=num_classes, softmax=True) #Focal #DiceCELoss(to_onehot_y=True, softmax=True)
 torch.backends.cudnn.benchmark = True
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-5)
 
@@ -288,8 +293,8 @@ def train(global_step, train_loader, dice_val_best, global_step_best):
 max_iterations = args.max_iteration #25000
 eval_num = math.ceil(args.max_iteration * 0.02)#500
 #WarmupCosineSchedule(optimizer, 10, 500, cycles = 0.5)
-post_label = AsDiscrete(to_onehot=True, num_classes=args.N_classes) 
-post_pred = AsDiscrete(argmax=True, to_onehot=True, num_classes=args.N_classes) 
+post_label = AsDiscrete(to_onehot=num_classes, num_classes=args.N_classes) 
+post_pred = AsDiscrete(argmax=True, to_onehot=num_classes, num_classes=args.N_classes) 
 dice_metric = DiceMetric(include_background=True, reduction="mean", get_not_nans=False)
 global_step = 0
 dice_val_best = 0.0
