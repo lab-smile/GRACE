@@ -186,26 +186,65 @@ model.eval()
 # exist_ok=True prevents an error if the directory already exists
 #Path(dirname).mkdir(parents=True, exist_ok=True)
 
+# Extract model name without extension
+ModelName = os.path.splitext(os.path.basename(args.model_load_name))[0]
+# Build path
+save_dir = os.path.join(args.data_dir, "TestResults", ModelName)
+# Create directories if they don’t exist
+os.makedirs(save_dir, exist_ok=True)
+
+#case_num = len(test_ds)
+#for i in range(case_num):
+#    #start_time = time.time()
+#    with torch.no_grad():
+#        #img_name = test_ds[i]["image_meta_dict"]["filename_or_obj"].split("/")[-1] #os.path.split(test_ds[i]["image_meta_dict"]["filename_or_obj"])[1]
+#        img_name = test_ds[i]["image"].meta["filename_or_obj"].split("/")[-1]
+#        img = test_ds[i]["image"]
+#        test_inputs = torch.unsqueeze(img, 1).cuda()
+#        #start_time = time.time()
+#        test_outputs = sliding_window_inference(test_inputs, (args.spatial_size, args.spatial_size, args.spatial_size), 4, model, overlap=0.8)
+#        #print("--- %s seconds ---" % (time.time() - start_time))
+#    #logits = test_outputs.detach().cpu().numpy()
+#    print("Saving image " + str(i))
+#    testimage = torch.argmax(test_outputs, dim=1).detach().cpu().numpy()
+#    #savepath = 'testimage' + str(i) + '.mat'
+#    filename, file_extension = os.path.splitext(img_name)
+#    savepath = filename + '.mat'
+#    savemat(os.path.join(save_dir, savepath), {'testimage':testimage})#, 'logits':logits})
+#    #print("--- %s seconds ---" % (time.time() - start_time))
+
+import nibabel as nib
+
 case_num = len(test_ds)
 for i in range(case_num):
-    #start_time = time.time()
     with torch.no_grad():
-        #img_name = test_ds[i]["image_meta_dict"]["filename_or_obj"].split("/")[-1] #os.path.split(test_ds[i]["image_meta_dict"]["filename_or_obj"])[1]
         img_name = test_ds[i]["image"].meta["filename_or_obj"].split("/")[-1]
         img = test_ds[i]["image"]
         test_inputs = torch.unsqueeze(img, 1).cuda()
-        #start_time = time.time()
-        test_outputs = sliding_window_inference(test_inputs, (args.spatial_size, args.spatial_size, args.spatial_size), 4, model, overlap=0.8)
-        #print("--- %s seconds ---" % (time.time() - start_time))
-    #logits = test_outputs.detach().cpu().numpy()
-    print("Saving image " + str(i))
-    testimage = torch.argmax(test_outputs, dim=1).detach().cpu().numpy()
-    #savepath = 'testimage' + str(i) + '.mat'
-    filename, file_extension = os.path.splitext(img_name)
-    savepath = filename + '.mat'
-    savemat(os.path.join(args.data_dir,'results', savepath), {'testimage':testimage})#, 'logits':logits})
-    #print("--- %s seconds ---" % (time.time() - start_time))
+        test_outputs = sliding_window_inference(
+            test_inputs,
+            (args.spatial_size, args.spatial_size, args.spatial_size),
+            4,
+            model,
+            overlap=0.8
+        )
 
+    print("Saving image " + str(i))
+    testimage = torch.argmax(test_outputs, dim=1).detach().cpu().numpy()[0]  # remove batch dim
+
+    # Load reference image with nibabel to get full header + affine
+    ref_nii = nib.load(img.meta["filename_or_obj"])
+    ref_header = ref_nii.header.copy()
+    ref_affine = ref_nii.affine
+
+    # Create new NIfTI with same header + affine
+    new_img = nib.Nifti1Image(testimage.astype(np.uint8), affine=ref_affine, header=ref_header)
+
+    # Build save path
+    filename, _ = os.path.splitext(img_name)
+    savepath = os.path.join(save_dir, filename + ".nii.gz")
+
+    nib.save(new_img, savepath)
 #------------------------------------
 
 #time since start
