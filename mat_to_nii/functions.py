@@ -23,7 +23,7 @@ def convert_to_nii(files):
         data = np.squeeze(data)
 
         # Create a NIfTI image object and set the data array
-        nifti_image = nib.Nifti1Image(data, affine=np.eye(4), dtype='int64')
+        nifti_image = nib.Nifti1Image(data, affine=np.eye(4))#, dtype='int64')
 
         # Save the NIfTI image to disk as a .nii file
         nib.save(nifti_image, newfilepath)
