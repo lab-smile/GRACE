@@ -47,7 +47,7 @@ Imaging NeuroScience<br>
 ## Usage
 
 ### Pretrained Models
-Our pretrained model can be found at the v1.0.1 release of this GitHub.
+Our pretrained model can be found at the v1.0.1 release of this GitHub. Please note that there is now two versions: 'GRACE_MONAI081.pth' to work with MONAI 0.8.1 (the original code release from the GRACE paper) and 'GRACE_MONAI150.pth' to work with MONAI 1.5.0 (the most recent MONAI as of September 2025).
 
 ### MATLAB Segmentation Label Preparation
 You can find there are two MATLAB codes, you can directly change the directory to your own data. You need to select the GRACE working folder and add to path before you running these two MATLAB codes. 
