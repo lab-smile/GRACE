@@ -1,0 +1,10 @@
+/data
+*.json
+*.log
+.DS_Store
+.vscode
+__pycache__/
+*.pyc
+.env
+*.sqlite3
+*.db
