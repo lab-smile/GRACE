@@ -242,5 +242,7 @@ Base model: UNETR (MONAI)
 https://github.com/Project-MONAI/research-contributions/tree/main/UNETR
 
 ## 📫 Contact
-Discussion, suggestions, and questions: Skylar Stolte, Dr. Ruogu Fang  
+Discussion, suggestions, and questions: 
+- Skylar Stolte - [Email](mailto:skylastolte4444@phhp.ufl.edu)
+- Dr. Ruogu Fang  - [Email](mailto:ruogu.fang@bme.ufl.edu)
 Smart Medical Informatics Learning & Evaluation Laboratory, Dept. of Biomedical Engineering, University of Florida
