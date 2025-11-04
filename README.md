@@ -24,9 +24,20 @@ If you use this code, please cite:
 - Average Hausdorff Distance: 0.21 (vs. runner-up 0.36).
 - Representative pretrained models available; particularly useful for older adult head MRIs.
 
-Notes:
-- fig. 1: GRACE segmentation labels are numerically encoded (e.g., voxel value “1” = white matter).
-- fig. 1: Comparative performance visualizations against common segmentation methods on four MRI head volumes.
+<table>
+  <tr>
+    <td width="50%">
+      <img src="Images/Figure11.png" alt="GRACE tissue label map" />
+      <p align="center"><strong>Figure:</strong> GRACE tissue label map — labels are numerically encoded (e.g., 1 = white matter).</p>
+      <p align="center"><a href="Images/Figure11.pdf">PDF</a></p>
+    </td>
+    <td width="50%">
+      <img src="Images/Figure3.png" alt="Comparison with common methods" />
+      <p align="center"><strong>Figure:</strong> GRACE vs. common segmentation methods on four MRI head volumes.</p>
+      <p align="center"><a href="Images/Figure3.pdf">PDF</a></p>
+    </td>
+  </tr>
+</table>
 
 ## 📥 Downloads and Releases
 Latest release: v1.0.1 — https://github.com/lab-smile/GRACE/releases/tag/v1.0.1  
