@@ -5,56 +5,59 @@
 #standard packages - 
 
 import os
-import shutil
-import tempfile
-import matplotlib.pyplot as plt
-import numpy as np
-from tqdm import tqdm
-import torch
-import torch.nn as nn
-import time
-import argparse
 import math
+import time
+import torch
+import argparse
+import numpy as np
 import pandas as pd
+import torch.nn as nn
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 #load monai functions - 
 
-from monai.losses import DiceCELoss, DiceFocalLoss
+from monai.losses import DiceCELoss
 from monai.inferers import sliding_window_inference
 from monai.transforms import (
-    AsDiscrete,
-    #AddChanneld,
     Compose,
-    CropForegroundd,
+    Spacingd,
+    RandFlipd,
+    ToTensord,
+    AsDiscrete,
     LoadImaged,
     Orientationd,
-    RandFlipd,
-    RandCropByPosNegLabeld,
+    RandRotate90d,
+    CropForegroundd,
+    RandGaussianNoised,
+    EnsureChannelFirstd,
     RandShiftIntensityd,
     ScaleIntensityRanged,
-    Spacingd,
-    RandRotate90d,
-    ToTensord,
-    SpatialPadd,
-    RandGaussianNoised,
-    EnsureChannelFirstd
+    RandCropByPosNegLabeld
 )
 
-from monai.config import print_config
 from monai.metrics import DiceMetric
+from monai.config import print_config
 from monai.networks.nets import UNETR
-from monai.optimizers import WarmupCosineSchedule
-#from monai.networks.nets import UNet
-
 from monai.data import (
-    DataLoader,
-    load_decathlon_datalist,
-    decollate_batch,
     Dataset,
-    pad_list_data_collate,
+    DataLoader,
+    decollate_batch,
+    load_decathlon_datalist,
+    pad_list_data_collate
 )
-
 #-----------------------------------
+
+def pick_device():
+    # auto: try CUDA, then MPS (Just an example, you may change this per your preference), then CPU
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
+
+device = pick_device()
+print(f"DEBUG Using device: {device}")
 
 #set up starting conditions:
 
@@ -63,21 +66,21 @@ print_config()
 
 # our CLI parser
 parser = argparse.ArgumentParser()
-parser.add_argument("--data_dir", type=str, default="/red/nvidia-ai/SkylarStolte/training_pairs_v5/", help="directory the dataset is in")
-parser.add_argument("--batch_size_train", type=int, default=10, help="batch size training data")
-parser.add_argument("--batch_size_validation", type=int, default=5, help="batch size validation data")
 parser.add_argument("--num_gpu", type=int, default=3, help="number of gpus")
-parser.add_argument("--N_classes", type=int, default=12, help="number of tissues classes")
 parser.add_argument("--spatial_size", type=int, default=64, help="one patch dimension")
-parser.add_argument("--model_save_name", type=str, default="unetr_v5_cos", help="model save name")
-parser.add_argument("--a_max_value", type=int, default=255, help="maximum image intensity")
 parser.add_argument("--a_min_value", type=int, default=0, help="minimum image intensity")
+parser.add_argument("--N_classes", type=int, default=12, help="number of tissues classes")
+parser.add_argument("--a_max_value", type=int, default=255, help="maximum image intensity")
 parser.add_argument("--max_iteration", type=int, default=25000, help="number of iterations")
-parser.add_argument("--json_name", type=str, default="dataset", help="name of the file used to map data splits")
+parser.add_argument("--batch_size_train", type=int, default=10, help="batch size training data")
+parser.add_argument("--model_save_name", type=str, default="unetr_v5_cos", help="model save name")
+parser.add_argument("--batch_size_validation", type=int, default=5, help="batch size validation data")
+parser.add_argument("--json_name", type=str, default="dataset.json", help="name of the file used to map data splits")
+parser.add_argument("--data_dir", type=str, default="/red/nvidia-ai/SkylarStolte/training_pairs_v5/", help="directory the dataset is in")
 args = parser.parse_args()
 
-split_JSON = args.json_name #"dataset.json"
-datasets = args.data_dir + split_JSON
+split_JSON = args.json_name #"dataset.json". Make sure that the JSON file, with exact name, is in the data_dir folder
+datasets = args.data_dir + split_JSON # Add / to data_dir if not present or change this line to hardcode the path
 num_classes = args.N_classes
 
 #-----------------------------------
@@ -88,13 +91,12 @@ train_transforms = Compose(
     [
         LoadImaged(keys=["image", "label"]),
         EnsureChannelFirstd(keys=["image", "label"]),
-        #AddChanneld(keys=["image", "label"]),
         Spacingd(
             keys=["image", "label"],
             pixdim=(1.0, 1.0, 1.0),
             mode=("bilinear", "nearest"),
         ),
-        Orientationd(keys=["image", "label"], axcodes="RAS"),
+        Orientationd(keys=["image", "label"], axcodes="RAS", labels=None),
         ScaleIntensityRanged(
             keys=["image"],
             a_min=args.a_min_value,
@@ -110,7 +112,8 @@ train_transforms = Compose(
             spatial_size=(args.spatial_size, args.spatial_size, args.spatial_size),
             pos=1,
             neg=1,
-            num_samples=16, #this number poses a limitation on training since inputs are batch size x num_samples x spatial_size
+            # reduce number of samples to lower memory use (was 16)
+            num_samples=1, # much smaller -> minimal memory (batch_size x num_samples x patch)
             image_key="image",
             image_threshold=0,
         ),
@@ -147,7 +150,6 @@ val_transforms = Compose(
     [
         LoadImaged(keys=["image", "label"]),
         EnsureChannelFirstd(keys=["image", "label"]),
-        #AddChanneld(keys=["image", "label"]),
         Spacingd(
             keys=["image", "label"],
             pixdim=(1.0, 1.0, 1.0),
@@ -173,41 +175,57 @@ train_ds = Dataset(
     transform=train_transforms,
 )
 train_loader = DataLoader(
-    train_ds, batch_size=args.batch_size_train, shuffle=True, num_workers=4, pin_memory=True, collate_fn=pad_list_data_collate,
+    train_ds,
+    batch_size=args.batch_size_train,
+    shuffle=True,
+    # use single-process loader inside small containers (lower memory). Increase if you have enough RAM.
+    num_workers=0,
+    # only pin memory when an accelerator is available
+    pin_memory=(device.type == "cuda" or (hasattr(torch.backends, "mps") and torch.backends.mps.is_available())),
+    collate_fn=pad_list_data_collate,
 )
 val_ds = Dataset(
     data=val_files, transform=val_transforms, 
 )
 val_loader = DataLoader(
-    val_ds, batch_size=args.batch_size_validation, shuffle=False, num_workers=4, pin_memory=True, collate_fn=pad_list_data_collate,
+    val_ds,
+    batch_size=args.batch_size_validation,
+    shuffle=False,
+    num_workers=0,
+    pin_memory=(device.type == "cuda" or (hasattr(torch.backends, "mps") and torch.backends.mps.is_available())),
+    collate_fn=pad_list_data_collate,
 )
 
 #-----------------------------------
 
 #set up gpu device and unetr model
 
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-model = nn.DataParallel(
-    UNETR(
+# build base model
+base_model = UNETR(
     in_channels=1,
     out_channels=args.N_classes, #12 for all tissues
     img_size=(args.spatial_size, args.spatial_size, args.spatial_size),
-    feature_size=16, 
+    feature_size=16,
     hidden_size=768,
     mlp_dim=3072,
     num_heads=12,
-    #pos_embed="perceptron",
     norm_name="instance",
     res_block=True,
     dropout_rate=0.0,
-), device_ids=[i for i in range(args.num_gpu)]).cuda()
+)
 
-#model = model.to(device)
+# Wrap with DataParallel only when CUDA is available and multiple GPUs requested.
+if device.type == "cuda" and args.num_gpu > 1 and torch.cuda.is_available():
+    model = nn.DataParallel(base_model, device_ids=[i for i in range(args.num_gpu)])
+    model = model.to(device)
+else:
+    # keep plain model for CPU or single-GPU runs
+    model = base_model.to(device)
 
 loss_function = DiceCELoss(to_onehot_y=num_classes, softmax=True) #Focal #DiceCELoss(to_onehot_y=True, softmax=True)
-torch.backends.cudnn.benchmark = True
+if device.type == "cuda":
+    torch.backends.cudnn.benchmark = True
+
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-5)
 
 #-----------------------------------
@@ -216,9 +234,11 @@ def validation(epoch_iterator_val):
     model.eval()
     dice_vals = list()
     with torch.no_grad():
-        for step, batch in enumerate(epoch_iterator_val):
-            val_inputs, val_labels = (batch["image"].cuda(), batch["label"].cuda())
-            val_outputs = sliding_window_inference(val_inputs, (args.spatial_size, args.spatial_size, args.spatial_size), 4, model)
+        for _, batch in enumerate(epoch_iterator_val):
+            val_inputs, val_labels = (batch["image"].to(device), batch["label"].to(device))
+            # choose a small sliding-window batch size on CPU to avoid OOM
+            sw_batch_size = 4 if device.type == "cuda" else 1
+            val_outputs = sliding_window_inference(val_inputs, (args.spatial_size, args.spatial_size, args.spatial_size), sw_batch_size, model)
             val_labels_list = decollate_batch(val_labels)
             val_labels_convert = [
                 post_label(val_label_tensor) for val_label_tensor in val_labels_list
@@ -248,15 +268,16 @@ def train(global_step, train_loader, dice_val_best, global_step_best):
     )
     for step, batch in enumerate(epoch_iterator):
         step += 1
-        x, y = (batch["image"].cuda(), batch["label"].cuda())
+        x, y = (batch["image"].to(device), batch["label"].to(device))
         logit_map = model(x)
         loss = loss_function(logit_map, y)
         loss.backward()
         epoch_loss += loss.item()
         optimizer.step()
         optimizer.zero_grad()
+        loss_val = loss.detach().item()
         epoch_iterator.set_description(
-            "Training (%d / %d Steps) (loss=%2.5f)" % (global_step, max_iterations, loss)
+            "Training (%d / %d Steps) (loss=%2.5f)" % (global_step, max_iterations, loss_val)
         )
         if (
             global_step % eval_num == 0 and global_step != 0
@@ -292,7 +313,6 @@ def train(global_step, train_loader, dice_val_best, global_step_best):
 
 max_iterations = args.max_iteration #25000
 eval_num = math.ceil(args.max_iteration * 0.02)#500
-#WarmupCosineSchedule(optimizer, 10, 500, cycles = 0.5)
 post_label = AsDiscrete(to_onehot=num_classes, num_classes=args.N_classes) 
 post_pred = AsDiscrete(argmax=True, to_onehot=num_classes, num_classes=args.N_classes) 
 dice_metric = DiceMetric(include_background=True, reduction="mean", get_not_nans=False)
@@ -305,7 +325,9 @@ while global_step < max_iterations:
     global_step, dice_val_best, global_step_best = train(
         global_step, train_loader, dice_val_best, global_step_best
     )
-model.load_state_dict(torch.load(os.path.join(args.data_dir, args.model_save_name + ".pth")))
+# load checkpoint using map_location so GPU-saved checkpoints can be loaded on CPU
+model.load_state_dict(torch.load(os.path.join(args.data_dir, args.model_save_name + ".pth"), map_location=device))
+
 
 #-----------------------------------
 
@@ -329,7 +351,7 @@ x = [eval_num * (i + 1) for i in range(len(metric_values))]
 y = metric_values
 plt.xlabel("Iteration")
 plt.plot(x, y)
-#plt.show()
+#plt.show() #uncomment to see the plot immediately
 plt.savefig(os.path.join(args.data_dir, args.model_save_name + "_training_metrics.pdf"))
 
 dict = {'Iteration': x, 'Dice': y}  
@@ -337,6 +359,5 @@ df = pd.DataFrame(dict)
 df.to_csv(os.path.join(args.data_dir,args.model_save_name + '_ValidationDice.csv'))
 
 #------------------------------------
-
 #time since start
 print("--- %s seconds ---" % (time.time() - start_time))

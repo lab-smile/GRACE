@@ -1,0 +1,26 @@
+services:
+  grace:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: grace:latest
+    platform: linux/arm64
+    shm_size: '2gb'
+    # If your Compose supports it, this is the simplest way:
+    gpus: all
+    #(Alternative for Swarm-style syntax shown below)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: ["gpu"]
+    environment:
+      - GRACE_DATA_DIR=/data
+    volumes:
+      - ./data:/data:rw           # raw input
+    working_dir: /workspace
+    # init: true
+    command: ["--help"]
+    # command: ["preprocess", "--source-folders", "d1", "d3", "d2", "--verbose"]
+    # command: ["train", "--data_dir", "/data", "--num_gpu","1","--model_save_name","grace", "--batch_size_train", "1", "--batch_size_validation", "1", "--max_iteration", "3", "--spatial_size", "32"]
+    # command: ["test", "--data_dir", "/data", "--model_load_name", "grace.pth", "--num_gpu","1", "--spatial_size", "32"]
