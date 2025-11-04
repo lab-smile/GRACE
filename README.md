@@ -35,14 +35,14 @@ If you use this code, please cite:
 <p align="center"><em>Figure 2: GRACE vs. common segmentation methods on four MRI head volumes.</em></p>
 
 ## 📥 Downloads and Releases
-Latest release: v1.0.1 — https://github.com/lab-smile/GRACE/releases/tag/v1.0.1  
+Latest release: v1.0.1 — https://github.com/lab-smile/GRACE/releases/tag/v1.0.1
 Assets:
-- GRACE_MONAI081.pth — model for MONAI 0.8.1 (original GRACE paper code)
-- GRACE_MONAI150.pth — model for MONAI 1.5.0 (latest MONAI as of Sep 2025)
+- GRACE_MONAI081.pth — pretrained model for MONAI 0.8.1 (original paper code)
+- GRACE_MONAI150.pth — pretrained model for MONAI 1.5.0 (latest as of Sep 2025)
 - Source code (zip)
 - Source code (tar.gz)
 
-Checksums and file sizes are listed on the release page.
+Note: Checksums and file sizes are listed on the release page. Choose the .pth that matches your MONAI version.
 
 ## 🔗 Quick Links
 - Paper (PubMed): https://pubmed.ncbi.nlm.nih.gov/38465203/
@@ -59,10 +59,6 @@ GRACE CLI processes NIfTI (.nii or .nii.gz) files with the GRACE model, includin
 [![GRACE demo video](https://img.youtube.com/vi/0YU7Yd-mK2g/hqdefault.jpg)](https://www.youtube.com/watch?v=0YU7Yd-mK2g "Watch the GRACE demo on YouTube")
 
 
-## Pretrained Models
-Find pretrained models under the v1.0.1 GitHub release:
-- GRACE_MONAI081.pth (for MONAI 0.8.1; original GRACE paper code)
-- GRACE_MONAI150.pth (for MONAI 1.5.0; latest as of September 2025)
 
 ## MATLAB: Segmentation Label Preparation
 Two MATLAB scripts are included. Set the GRACE working folder and add it to the path, then run:
