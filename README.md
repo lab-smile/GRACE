@@ -245,4 +245,5 @@ https://github.com/Project-MONAI/research-contributions/tree/main/UNETR
 Discussion, suggestions, and questions: 
 - Skylar Stolte - [Email](mailto:skylastolte4444@phhp.ufl.edu)
 - Dr. Ruogu Fang  - [Email](mailto:ruogu.fang@bme.ufl.edu)
-Smart Medical Informatics Learning & Evaluation Laboratory, Dept. of Biomedical Engineering, University of Florida
+
+_Smart Medical Informatics Learning & Evaluation Laboratory, Dept. of Biomedical Engineering, University of Florida_
