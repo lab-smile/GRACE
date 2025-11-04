@@ -28,6 +28,16 @@ Notes:
 - fig. 1: GRACE segmentation labels are numerically encoded (e.g., voxel value “1” = white matter).
 - fig. 1: Comparative performance visualizations against common segmentation methods on four MRI head volumes.
 
+## 📥 Downloads and Releases
+Latest release: v1.0.1 — https://github.com/lab-smile/GRACE/releases/tag/v1.0.1  
+Assets:
+- GRACE_MONAI081.pth — model for MONAI 0.8.1 (original GRACE paper code)
+- GRACE_MONAI150.pth — model for MONAI 1.5.0 (latest MONAI as of Sep 2025)
+- Source code (zip)
+- Source code (tar.gz)
+
+Checksums and file sizes are listed on the release page.
+
 ## 🔗 Quick Links
 - Paper (PubMed): https://pubmed.ncbi.nlm.nih.gov/38465203/
 - Base model (MONAI UNETR): https://github.com/Project-MONAI/research-contributions/tree/main/UNETR
