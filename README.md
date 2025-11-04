@@ -66,7 +66,7 @@ Two MATLAB scripts are included. Set the GRACE working folder and add it to the 
 ```matlab
 image(index) = tissue_cond_updated.Labels(k)
 ```
-Run combine_mask.m. Expected output structure:
+Run combine_masks.m. Expected output structure:
 ```
 Data
   ImagesTr   sub-TrX_T1.nii, sub-TrXX_T1.nii, ...
