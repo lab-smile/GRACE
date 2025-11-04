@@ -27,14 +27,12 @@ If you use this code, please cite:
 <table>
   <tr>
     <td width="50%">
-      <img src="Images/Figure11.png" alt="GRACE tissue label map" />
-      <p align="center"><strong>Figure:</strong> GRACE tissue label map — labels are numerically encoded (e.g., 1 = white matter).</p>
-      <p align="center"><a href="Images/Figure11.pdf">PDF</a></p>
+      <img src="Images/Figure3.png" alt="GRACE vs. common segmentation methods on four MRI head volumes" width="100%" />
+      <p align="center"><em>GRACE vs. common segmentation methods on four MRI head volumes.</em></p>
     </td>
     <td width="50%">
-      <img src="Images/Figure3.png" alt="Comparison with common methods" />
-      <p align="center"><strong>Figure:</strong> GRACE vs. common segmentation methods on four MRI head volumes.</p>
-      <p align="center"><a href="Images/Figure3.pdf">PDF</a></p>
+      <img src="Images/Figure11.png" alt="GRACE tissue label map with numeric codes" width="100%" />
+      <p align="center"><em>Tissue label map — labels are numerically encoded (e.g., 1 = white matter).</em></p>
     </td>
   </tr>
 </table>
