@@ -6,11 +6,6 @@ Precise and rapid whole-head tissue segmentation for older adult T1-weighted MRI
 - Code: Official implementation for training and using GRACE
 - Pretrained model: Optimized for older adult heads to enable high-precision modeling in age-related brain disorders
 - Dataset: Trained/validated on 177 manually corrected MR-derived segmentations, each thoroughly reviewed
-
-## ▶️ Demo Video
-
-[![GRACE demo video](https://img.youtube.com/vi/0YU7Yd-mK2g/hqdefault.jpg)](https://www.youtube.com/watch?v=0YU7Yd-mK2g "Watch the GRACE demo on YouTube")
-
 ## Citation
 If you use this code, please cite:
 ```
@@ -39,10 +34,14 @@ Notes:
 - GRACE CLI: https://github.com/lab-smile/grace-cli
 - Demo video: https://www.youtube.com/watch?v=0YU7Yd-mK2g&feature=youtu.be
 
-## 🛠️ GRACE CLI (Companion Tool)
+## GRACE CLI (Companion Tool)
 GRACE CLI processes NIfTI (.nii or .nii.gz) files with the GRACE model, including batch processing. See the repo for full usage.
 - Link: https://github.com/lab-smile/grace-cli
 - Prerequisites: Python 3.1x, ability to create virtual environments (python3-venv), Docker (optional)
+
+#### Demo Video
+[![GRACE demo video](https://img.youtube.com/vi/0YU7Yd-mK2g/hqdefault.jpg)](https://www.youtube.com/watch?v=0YU7Yd-mK2g "Watch the GRACE demo on YouTube")
+
 
 ## Pretrained Models
 Find pretrained models under the v1.0.1 GitHub release:
