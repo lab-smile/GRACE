@@ -62,7 +62,7 @@ GRACE CLI processes NIfTI (.nii or .nii.gz) files with the GRACE model, includin
 Whole Head Segmentator is a web based tool which will let you test our models like GRACE, DOMINO and DOMINO++ directly on web which any downloads or extra steps, just upload and select which model you are willing to test. It also facilitates the viewing of MRI images in 2D and 3D. 
 _**Disclaimer**: Uploaded volumes are sent to the backend to compute segmentations. Results are not intended for direct clinical decision-making. Do not upload data with direct identifiers or data that violates your data use or ethics agreements._
 
-- Link: https://https://grace-web-tool.vercel.app/
+- Link: https://grace-web-tool.vercel.app/
 
 #### Demo Video
 [![Whole Head Segmentator - GRACE Demo](https://img.youtube.com/vi/FGkOLj6yn6g/hqdefault.jpg)](https://youtu.be/FGkOLj6yn6g "Watch the GRACE demo on YouTube")
