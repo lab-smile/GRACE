@@ -1,0 +1,64 @@
+Model Weights License – Research Use Only (Privacy-Protective)
+
+Copyright (c) 2026 SMILE Lab
+
+IMPORTANT: These model weights were trained on private and/or sensitive data.
+Special restrictions apply to prevent misuse, data reconstruction, or privacy
+violations.
+
+1. Scope of License
+
+This license applies ONLY to the model weights provided in this repository,
+including but not limited to files with extensions such as:
+.pt, .pth, .ckpt, .bin, .safetensors, or similar.
+
+Source code is licensed separately under the MIT License and is NOT covered by
+this license.
+
+2. Permitted Uses
+
+You are permitted to use the model weights solely for:
+- Non-commercial academic or internal research
+- Evaluation, benchmarking, and testing
+- Research publications, provided no weights are redistributed
+
+3. Prohibited Uses
+
+You are expressly prohibited from:
+- Using the model weights for any commercial purpose
+- Deploying the model or weights in production systems or services
+- Redistributing, selling, sublicensing, or sharing the weights
+- Fine-tuning, distilling, or training derivative models intended for
+  deployment or commercial use
+- Attempting to extract, reconstruct, infer, or identify training data
+- Performing membership inference, data extraction, or model inversion attacks
+- Using the model in ways that could expose or compromise private data
+
+4. Privacy and Security Obligations
+
+You must take reasonable technical and organizational measures to:
+- Prevent unauthorized access to the model weights
+- Prevent downstream leakage or exposure of sensitive information
+- Ensure the model is not used to identify individuals or private data sources
+
+5. No Redistribution
+
+Redistribution of the model weights, in whole or in part, is strictly prohibited
+without prior written permission from the copyright holder.
+
+6. No Warranty
+
+THE MODEL WEIGHTS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+
+7. Termination
+
+Any violation of this license automatically terminates all rights granted
+herein. Upon termination, you must delete all copies of the model weights in
+your possession or control.
+
+8. Governing Law
+
+This license shall be governed by and construed in accordance with the laws of
+the applicable jurisdiction of the copyright holder.
