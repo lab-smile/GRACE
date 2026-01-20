@@ -250,6 +250,30 @@ Supported by NIH/NIA (RF1AG071469, R01AG054077), NSF (1842473, 1908299, 2123809)
 Base model: UNETR (MONAI)
 https://github.com/Project-MONAI/research-contributions/tree/main/UNETR
 
+## License and Data Privacy
+
+### Source Code
+All source code in this repository is licensed under the **MIT License**.
+See the `LICENSE` file for details.
+
+### Model Weights
+Pretrained model weights provided with this project are licensed for
+**non-commercial research use only** and are subject to **strict privacy
+protections**.
+
+The model weights were trained on private and/or sensitive data.
+Accordingly:
+
+- Commercial use is **not permitted**
+- Redistribution of weights is **not permitted**
+- Deployment in production or clinical systems is **not permitted**
+- Attempts to extract, reconstruct, infer, or identify training data
+  (including model inversion or membership inference) are **strictly prohibited**
+
+See the `MODEL_LICENSE` file for the full terms and conditions governing
+use of the model weights.
+
+
 ## 📫 Contact
 Discussion, suggestions, and questions: 
 - Skylar Stolte - [Email](mailto:skylastolte4444@phhp.ufl.edu)
