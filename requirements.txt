@@ -1,14 +1,38 @@
+# ── NOTE on torch ─────────────────────────────────────────────────────────────
+# torch is intentionally NOT listed here.
+# In Docker it is provided by the base image:
+#   pytorch/pytorch:2.4.0-cuda12.1-cudnn9-runtime
+# For local / conda / venv use, install it first with the correct wheel:
+#   CUDA 12.x : pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu121
+#   CUDA 11.8 : pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu118
+#   CPU / MPS : pip install torch==2.4.0 torchvision==0.19.0
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Core framework
 monai==1.5.1
+torchvision
+
+# Numerics / data
 numpy
 pandas
+scipy
 scikit-learn
 scikit-image
 joblib
-tqdm
+
+# Medical imaging I/O
 nibabel
-einops
+SimpleITK
 pynrrd
 lmdb
+
+# Visualisation
+matplotlib
+Pillow
+
+# Training utilities
+tqdm
+einops
 gdown
 pytorch-ignite
 transformers
@@ -16,4 +40,3 @@ tensorboard
 mlflow
 psutil
 clearml
-torchvision

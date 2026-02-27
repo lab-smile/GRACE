@@ -113,6 +113,75 @@ The preprocess.py script converts GRACE-style raw data into nnU-Net format. Data
 Creates nnU-Net folders: imagesTr, labelsTr, imagesTs, labelsTs.
 3) JSON Dataset Generation: Creates dataset.json; reserves 10% of training for validation, producing training, validation, and test splits in JSON.
 
+## Convenience Scripts for Direct Python Use
+
+The following scripts are provided for users running training directly with Python (without Docker or Singularity). The intended workflow is: **set up environment → verify → train**.
+
+### 1. Environment setup
+
+Install `torch` first (it is not listed in `requirements.txt` because the Docker base image provides it), then install the remaining dependencies.
+
+**conda:**
+```bash
+conda create -n grace python=3.11 -y
+conda activate grace
+
+# CUDA 12.x
+pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu121
+# CUDA 11.8
+# pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu118
+# CPU / Apple Silicon (MPS)
+# pip install torch==2.4.0 torchvision==0.19.0
+
+pip install -r requirements.txt
+```
+
+**venv:**
+```bash
+python -m venv grace_env
+source grace_env/bin/activate          # Windows: grace_env\Scripts\activate
+
+# CUDA 12.x
+pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu121
+# CUDA 11.8
+# pip install torch==2.4.0 torchvision==0.19.0 --index-url https://download.pytorch.org/whl/cu118
+# CPU / Apple Silicon (MPS)
+# pip install torch==2.4.0 torchvision==0.19.0
+
+pip install -r requirements.txt
+```
+
+### 2. Environment verification — `smoke_test.py`
+
+Confirms that the environment and GRACE model logic are working correctly. Requires **no real data** — it generates synthetic NIfTI volumes internally, exercises the full transform → UNETR forward pass → loss → Dice metric pipeline, and prints a per-check PASS/FAIL summary.
+
+```bash
+python smoke_test.py   # exit code 0 = all passed
+```
+
+### 3. Standalone pipeline — `grace_pipeline.py`
+
+A single-file training (and optionally inference) script with all hyperparameters collected in a CONFIG block at the top. Unlike `train.py` / `test.py`, it requires no command-line flags and handles `dataset.json` automatically.
+
+**Startup behavior:**
+- `dataset.json` already present → used as-is.
+- `dataset.json` missing, but `imagesTr/`, `labelsTr/`, `imagesTs/`, `labelsTs/` all contain `.nii` files → `dataset.json` is auto-generated (90/10 train/val split, `random_state=42`) and training starts.
+- Required directories missing or empty → a clear error is printed and the script exits before any training begins.
+
+**Steps:**
+1. Set `DATA_DIR` in the CONFIG block at the top of `grace_pipeline.py`.
+2. Optionally adjust `MODEL_SAVE_NAME`, `NUM_GPU`, `MAX_ITERATIONS`, etc.
+3. Set `RUN_TEST = True` to automatically run inference on the held-out test split after training finishes (using the best saved weights). Leave it as `False` to train only.
+4. Run:
+
+```bash
+python grace_pipeline.py
+```
+
+Training outputs (written to `DATA_DIR`): `.pth` model, `_Loss.csv`, `_ValidationDice.csv`, `_training_metrics.pdf`.
+
+Inference outputs (when `RUN_TEST = True`): `DATA_DIR/TestResults/{MODEL_SAVE_NAME}/<case>.nii.gz` — one compressed NIfTI per test case, preserving the original header and affine.
+
 ## Singularity Container
 
 ### Singularity Command Structure
