@@ -232,6 +232,16 @@ docker run -v "$(pwd)/data:/data" nikmk26/grace:latest train --data_dir /data --
 docker run -v "$(pwd)/data:/data" nikmk26/grace:latest test --data_dir /data --model_load_name grace_1.pth --spatial_size 32 --json_name dataset.json --num_gpu 1
 ```
 
+## Inference on macOS with Apple Silicon
+
+You can easily run testing/inference on Mac computers with Apple Silicon processors:
+ - set up a Python virtual environment with `python3 -m venv venv` and enable it with `source venv/bin/activate`
+ - install the requirements `pip install -r requirements.txt`
+ - make sure you have a directory e.g. `MY_DATA_PATH` containing a `dataset.json` file pointing to MRI images, and the `GRACE_MONAI150.pth` file
+ - run GRACE inference as you would do on any other platform: `python test.py --data_dir MY_DATA_PATH --model_load_name GRACE_MONAI150.pth`
+
+ Segmentation takes about 1-2 minutes on a system with an M1 Ultra processor.
+
 ## File Conversion
 Additional utilities:
 - /mat_to_nii: Convert .mat files to .nii. Add files to the FILES variable in /mat_to_nii/main.py and run the script.
