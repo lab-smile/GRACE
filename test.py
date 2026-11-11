@@ -2,7 +2,7 @@
 
 #load packages:
 
-#standard packages - 
+#standard packages -
 
 import os
 import torch
@@ -11,7 +11,7 @@ import numpy as np
 import torch.nn as nn
 import nibabel as nib
 
-#load monai functions - 
+#load monai functions -
 from monai.losses import DiceCELoss
 from monai.inferers import sliding_window_inference
 from monai.transforms import (
@@ -100,7 +100,7 @@ test_transforms = Compose(
 test_files = load_decathlon_datalist(datasets, True, "test")
 
 test_ds = Dataset(
-    data=test_files, transform=test_transforms, 
+    data=test_files, transform=test_transforms,
 )
 test_loader = DataLoader(
     test_ds, batch_size=args.batch_size_test, shuffle=False, num_workers=4, pin_memory=True, collate_fn=pad_list_data_collate,
@@ -109,6 +109,8 @@ test_loader = DataLoader(
 sample = test_ds[0]
 print("DEBUG sample keys:", sample.keys())
 print("DEBUG sample type:", type(sample["image"]))
+
+model_path = os.path.join(args.data_dir, args.model_load_name)
 
 #-----------------------------------
 
@@ -120,7 +122,7 @@ if args.dataparallel == "True" and device.type == "cuda":
         in_channels=1,
         out_channels=args.N_classes, #12 for all tissues
         img_size=(args.spatial_size, args.spatial_size, args.spatial_size),
-        feature_size=16, 
+        feature_size=16,
         hidden_size=768,
         mlp_dim=3072,
         num_heads=12,
@@ -128,13 +130,16 @@ if args.dataparallel == "True" and device.type == "cuda":
         res_block=True,
         dropout_rate=0.0,
     ), device_ids=[i for i in range(args.num_gpu)]).cuda()
-  
-elif args.dataparallel == "False" or device.type != "cuda":  
+
+    state_dict = torch.load(model_path)
+
+elif args.dataparallel == "False" or device.type != "cuda":
+
     model = UNETR(
         in_channels=1,
         out_channels=args.N_classes, #12 for all tissues
         img_size=(args.spatial_size, args.spatial_size, args.spatial_size),
-        feature_size=16, 
+        feature_size=16,
         hidden_size=768,
         mlp_dim=3072,
         num_heads=12,
@@ -143,15 +148,28 @@ elif args.dataparallel == "False" or device.type != "cuda":
         dropout_rate=0.0,
     ).to(device)
 
+    # Since we are not loading to a CUDA device, remap the weights to CPU memory. The model will run on the selected device anyway.
+    state_dict = torch.load(model_path, map_location=torch.device('cpu'))
+
+    # The model was saved using the nn.DataParallel wrapper which adds "module." prefixes. Here we remove the prefixes, since we are not using DataParallel.
+    state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
+
+# Load the weights using strict=False because of MONAI's TransformerBlock including the cross attention weights, which are not needed in this case.
+# See: https://github.com/Project-MONAI/MONAI/pull/8584
+missing, unexpected = model.load_state_dict(state_dict, strict=False)
+#print("Missing keys:", missing)
+#print("Unexpected keys:", unexpected)
+
+model.eval()
+
+
+#-----------------------------------
 loss_function = DiceCELoss(to_onehot_y=True, softmax=True)
 
 if device.type == "cuda":
     torch.backends.cudnn.benchmark = True
 optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-5)
 
-#-----------------------------------
-model.load_state_dict(torch.load(os.path.join(args.data_dir, args.model_load_name)))#, strict=False)
-model.eval()
 
 #-----------------------------------
 # Extract model name without extension

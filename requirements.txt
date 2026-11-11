@@ -1,4 +1,4 @@
-monai==1.5.1
+monai>=1.5.1
 numpy
 pandas
 scikit-learn
@@ -17,3 +17,6 @@ mlflow
 psutil
 clearml
 torchvision
+
+# For macOS with the mps device (Apple Silicon), torch before 2.14 causes system instability and crashes during inference.
+torch>=2.14.0; sys_platform == 'darwin'
